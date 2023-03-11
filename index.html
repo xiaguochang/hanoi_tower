@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>汉诺塔/河内塔/堆栈塔</title>
+	<script src="./vue.min.js"></script>
+	<style type="text/css">
+		[v-cloak] {
+			display: none;
+		}
+		body {
+			margin: 0;
+			padding: 0;
+			font-family: Arial, sans-serif;
+		}
+		#app {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+		h1 {
+			margin-top: 0;
+		}
+		.container {
+			display: -webkit-box;
+			display: -webkit-flex;
+			display: -moz-box;
+			display: -ms-flexbox;
+			display: flex;
+			-webkit-box-pack: justify;
+			-webkit-justify-content: space-between;
+			   -moz-box-pack: justify;
+			    -ms-flex-pack: justify;
+			        justify-content: space-between;
+		}
+		.box {
+			border: 1px solid #ccc;
+			-webkit-border-radius: 10px;
+			   -moz-border-radius: 10px;
+			        border-radius: 10px;
+			width: 298px;
+			height: 400px;
+		}
+		.step_display {
+			border: 1px solid #ccc;
+			width: 298px;
+			height: 400px;
+		}
+		.step_info{
+			font-size: 18px;
+			font-weight: bold;
+			margin: 5px;
+		}
+		.step_moves {
+			width: 288px;
+			height: 355px;
+			padding: 5px;
+			overflow: auto;
+		}
+		.tower {
+			margin: auto;
+			position: relative;
+			width: 10px;
+			height: 350px;
+			-webkit-border-radius: 3px 3px 0px 0px;
+			   -moz-border-radius: 3px 3px 0px 0px;
+			        border-radius: 3px 3px 0px 0px;
+			display: -webkit-box;
+			display: -webkit-flex;
+			display: -moz-box;
+			display: -ms-flexbox;
+			display: flex;
+			-webkit-box-orient: vertical;
+			-webkit-box-direction: normal;
+			-webkit-flex-direction: column;
+			   -moz-box-orient: vertical;
+			   -moz-box-direction: normal;
+			    -ms-flex-direction: column;
+			        flex-direction: column;
+			-webkit-box-align: center;
+			-webkit-align-items: center;
+			   -moz-box-align: center;
+			    -ms-flex-align: center;
+			        align-items: center;
+			-webkit-box-pack: end;
+			-webkit-justify-content: flex-end;
+			   -moz-box-pack: end;
+			    -ms-flex-pack: end;
+			        justify-content: flex-end;
+			background: -webkit-gradient(linear, left top, right top, from(#707070) , to(#d1d1d1));
+			background: -webkit-linear-gradient(left, #707070 , #d1d1d1);
+			background: -moz-linear-gradient(left, #707070 , #d1d1d1);
+			background: -o-linear-gradient(left, #707070 , #d1d1d1);
+			background: linear-gradient(left, #707070 , #d1d1d1);
+		}
+		.tower_select {
+			background-color: #ddd;
+		}
+		.base {
+			width: 300px;
+			height: 50px;
+			-webkit-border-radius: 10px;
+			   -moz-border-radius: 10px;
+			        border-radius: 10px;
+			background: #bbb;
+			display: -webkit-box;
+			display: -webkit-flex;
+			display: -moz-box;
+			display: -ms-flexbox;
+			display: flex;
+			-webkit-box-align: center;
+			-webkit-align-items: center;
+			   -moz-box-align: center;
+			    -ms-flex-align: center;
+			        align-items: center;
+			-webkit-box-pack: center;
+			-webkit-justify-content: center;
+			   -moz-box-pack: center;
+			    -ms-flex-pack: center;
+			        justify-content: center;
+		}
+		.disk {
+			position: relative;
+			width: 60px;
+			height: 30px;
+			-webkit-transition: all 0.5s;
+			-o-transition: all 0.5s;
+			-moz-transition: all 0.5s;
+			transition: all 0.5s;
+			border: 2px solid #99aaff;
+			-webkit-border-radius: 10px;
+			   -moz-border-radius: 10px;
+			        border-radius: 10px;
+			display: -webkit-box;
+			display: -webkit-flex;
+			display: -moz-box;
+			display: -ms-flexbox;
+			display: flex;
+			-webkit-box-align: center;
+			-webkit-align-items: center;
+			   -moz-box-align: center;
+			    -ms-flex-align: center;
+			        align-items: center;
+			-webkit-box-pack: center;
+			-webkit-justify-content: center;
+			   -moz-box-pack: center;
+			    -ms-flex-pack: center;
+			        justify-content: center;
+			background: -webkit-gradient(linear, left top, right top, from(#00aeff) , to(#93e9ff));
+			background: -webkit-linear-gradient(left, #00aeff , #93e9ff);
+			background: -moz-linear-gradient(left, #00aeff , #93e9ff);
+			background: -o-linear-gradient(left, #00aeff , #93e9ff);
+			background: linear-gradient(left, #00aeff , #93e9ff);
+		}
+		.text{
+			color: #fff;
+			text-shadow: #99aaff 3px 3px 3px;
+		}
+		.disk_select {
+			background: -webkit-gradient(linear, left top, right top, from(#eeccff), to(#cc55ff));
+			background: -webkit-linear-gradient(left, #eeccff, #cc55ff);
+			background: -moz-linear-gradient(left, #eeccff, #cc55ff);
+			background: -o-linear-gradient(left, #eeccff, #cc55ff);
+			background: linear-gradient(left, #eeccff, #cc55ff);
+		}
+		.info {
+			margin-top: 20px;
+		}
+		.controls {
+			margin-top: 20px;
+		}
+	</style>
+</head>
+<body>
+	<div id="app" v-cloak>
+		<h1>汉诺塔游戏</h1>
+		<div class="container">
+			<div class="box" v-for="(tower, towerIndex) in towers" :key="towerIndex" @click="selectTower(towerIndex, tower)">
+				<div class="tower">
+					<div class="disk" v-for="(disk, diskIndex) in tower" :key="diskIndex" :class="{'disk_select': towerIndex === selectedTowerIndex && diskIndex === 0}" :style="{width: 60 + disk * (200 / startLevels) + 'px' }">
+						<div class="text" v-text="disk"></div>
+					</div>
+				</div>
+				<div class="base" v-text="String.fromCharCode(towerIndex + 65)"></div>
+			</div>
+			<div class="step_display">
+				<div class="step_info">步骤展示</div>
+				<div class="step_moves" ref="step_moves">
+					<ol>
+						<li v-for="(move, moveIndex) in moves" :key="moveIndex" v-text="String.fromCharCode(move[0] + 65) + '柱移到' + String.fromCharCode(move[1] + 65) + '柱'"></li>
+					</ol>
+				</div>
+			</div>
+		</div>
+		
+		<div class="info">
+			<div>规则：每次移动一块，小的放在大的上面, 将它移动到另一根柱子上</div>
+			<div>最小步数：<span v-text="minSteps"></span></div>
+			<div>计时（秒）：<span v-text="second"></span></div>
+			<div>移动步数：<span v-text="steps"></span></div>
+		</div>
+		<div class="controls">
+			<label for="levels">选择层数：</label>
+			<input type="number" id="levels" v-model="levels" max="10" min="2">
+			<button @click="startGame">开始游戏</button>
+			<button @click="recall">撤回到上一步</button>
+			<button @click="autoMove">自动移动</button>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+		vm = new Vue({
+		el: '#app',
+		data: {
+			timer: {
+				timekeeper: null,
+				autoMove: null,
+			},
+			selectedTowerIndex: null,
+			second: 0,
+			steps: 0,
+			minSteps: 0,
+			levels: 3,
+			start: false,
+			autoStart: false,
+			startLevels: 0,
+			towers: [[], [], []],
+			moves: [],
+		},
+		methods: {
+			// 手动移动
+			selectTower(index, tower) {
+				if (!this.start) {
+					return;
+				}
+				if (this.selectedTowerIndex === null) {
+					if (tower.length > 0) {
+						this.selectedTowerIndex = index;
+					}
+				} else if (this.selectedTowerIndex === index) {
+					this.selectedTowerIndex = null;
+				} else {
+					selectedTower = this.towers[this.selectedTowerIndex];
+					if (tower.length === 0 || tower[0] > selectedTower[0]) {
+						tower.unshift(selectedTower.shift());
+						this.moves.push([this.selectedTowerIndex, index]); //记录步骤
+						this.selectedTowerIndex = null;
+						this.steps++;
+						if (tower.length === this.startLevels) {
+							this.start = false;
+							clearInterval(this.timer.timekeeper);
+							alert('完成');
+						}
+					} else {
+						alert('小的放在大的上面');
+					}
+				}
+			},
+			// 开始游戏
+			startGame() {
+				if (this.start || this.autoStart) {
+					if (confirm("游戏正在进行，确认重新开始？")) {
+						this.restartGame();
+					}
+				} else {
+					this.restartGame();
+				}
+			},
+			// 重置游戏
+			restartGame() {
+				clearInterval(this.timer.autoMove);
+				clearInterval(this.timer.timekeeper);
+				this.moves = [];
+				this.start = true;
+				this.autoStart = false;
+				this.setTower();
+				var that = this;
+				this.timer.timekeeper = setInterval(function(){
+					that.second++;
+				}, 1000);
+			},
+			// 设定层数
+			setTower() {
+				if (this.levels >= 2 && this.levels <= 10) {
+					this.towers = [[], [], []]
+					for (let i = 1; i <= this.levels; i++) {
+						this.towers[0].push(i)
+					}
+					this.selectedTowerIndex = null
+					this.startLevels = this.levels;
+					this.second = 0;
+					this.steps = 0;
+					this.minSteps = Math.pow(2, this.startLevels) - 1;
+				} else {
+					alert("层数在2-10");
+				}
+			},
+			/** 
+			 * levels 层数
+			 * a_index A柱索引 
+			 * b_index B柱索引
+			 * c_index C柱索引
+			 * moves 步骤集合
+			 */
+			hanoi(levels, a_index, b_index, c_index, moves) {
+				if (levels <= 0) {
+					return moves
+				}
+				if (levels === 1) {
+					moves.push([a_index, c_index]);
+				} else {
+					this.hanoi(levels - 1, a_index, c_index, b_index, moves);
+					moves.push([a_index, c_index]);
+					this.hanoi(levels - 1, b_index, a_index, c_index, moves);
+				}
+				return moves
+			},
+			// 开始自动移动
+			autoMove() {
+				if (this.start || this.autoStart) {
+					if (confirm("游戏正在进行，确认重新开始？")) {
+						this.handle();
+					}
+				} else {
+					this.handle();
+				}
+			},
+			// 定时处理步骤集合
+			handle() {
+				clearInterval(this.timer.timekeeper);
+				clearInterval(this.timer.autoMove);
+				this.moves = [];
+				this.start = false;
+				this.autoStart = true;
+				this.setTower();
+				let moves = this.hanoi(this.startLevels, 0, 1, 2, []); //获取步数集
+				let that = this;
+				let i = 0;
+				let len = moves.length;
+				this.timer.autoMove = setInterval(function(){
+					if (i < len) {
+						that.move(moves[i][0], moves[i][1])
+						that.moves.push(moves[i]); //记录步骤
+						this.steps++;
+						i++;
+					} else {
+						that.autoStart = false;
+						clearInterval(that.timer.autoMove);
+					}
+				}, 1000);
+			},
+			// 移动
+			move(a_index, b_index) {
+				sourceTower = this.towers[a_index];
+				destTower = this.towers[b_index];
+				destTower.unshift(sourceTower.shift());
+				this.scrollToBottom();
+				this.selectedTowerIndex = null;
+			},
+			// 撤回到上一步
+			recall() {
+				if (this.start) {
+					let len = this.moves.length;
+					if (len > 0) {
+						this.move(this.moves[len - 1][1], this.moves[len - 1][0]);
+						this.moves.pop();
+						this.selectedTowerIndex = null;
+						this.steps--;
+					}
+				}
+			},
+			// 步骤滚动到底部
+			scrollToBottom() {
+				let step_moves = this.$refs.step_moves;
+				let diff_height = step_moves.scrollHeight - step_moves.clientHeight;
+				if (diff_height > 0) {
+					step_moves.scrollTop = diff_height;
+				}
+			},
+		}
+	})
+	// console.log(vm.$refs.step_moves, vm.$el.querySelector('.step_moves'));
+</script>
+</html>
