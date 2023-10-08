@@ -201,7 +201,7 @@
 		</div>
 		<div class="controls">
 			<label for="levels">选择层数：</label>
-			<input type="number" id="levels" v-model="levels" max="10" min="2">
+			<input type="number" id="levels" v-model.number="levels" max="10" min="2">
 			<button @click="startGame">开始游戏</button>
 			<button @click="recall">撤回到上一步</button>
 			<button @click="autoMove">自动移动</button>
@@ -230,6 +230,7 @@
 		methods: {
 			// 手动移动
 			selectTower(index, tower) {
+				console.log(index, tower);
 				if (!this.start) {
 					return;
 				}
@@ -380,5 +381,6 @@
 		}
 	})
 	// console.log(vm.$refs.step_moves, vm.$el.querySelector('.step_moves'));
+	console.log("1、汉诺塔模块为奇数时，最上面的移动到目标柱；2、汉诺塔模块为偶数时，最上面的移动到过渡柱");
 </script>
 </html>
