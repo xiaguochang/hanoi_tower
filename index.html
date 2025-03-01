@@ -173,6 +173,34 @@
         .controls {
             margin-top: 20px;
         }
+        /* 弹窗基础样式 */
+        dialog {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 300px;
+        }
+
+        /* 遮罩层样式 */
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+
+        /* 弹窗内容布局 */
+        .dialog-content {
+            text-align: center;
+        }
+        .confirm-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
     </style>
 </head>
 <body>
@@ -210,6 +238,13 @@
             <button @click="recall">撤回到上一步</button>
             <button @click="autoMove">自动移动</button>
         </div>
+        <dialog ref="dialog">
+            <div class="dialog-content">
+                <h3 v-text="title"></h3>
+                <p v-text="content"></p>
+                <button class="confirm-btn" @click="closeAlert()">确定</button>
+            </div>
+        </dialog>
     </div>
 </body>
 <script type="text/javascript">
@@ -230,6 +265,8 @@
             startLevels: 0,
             towers: [[], [], []],
             moves: [],
+            title: '提示',
+            content: '完成',
         },
         methods: {
             // 手动移动
@@ -253,10 +290,14 @@
                         if (tower.length === this.startLevels) {
                             this.start = false;
                             clearInterval(this.timer.timekeeper);
-                            alert('完成');
+                            this.title = "系统提示";
+                            this.content = "恭喜完成";
+                            this.showAlert()
                         }
                     } else {
-                        alert('小的放在大的上面');
+                        this.title = "系统提示";
+                        this.content = "小的放在大的上面";
+                        this.showAlert()
                     }
                 }
             },
@@ -272,12 +313,15 @@
             },
             // 重置游戏
             restartGame() {
+                let is_start = this.setTower();
+                if (!is_start) {
+                    return;
+                }
                 clearInterval(this.timer.autoMove);
                 clearInterval(this.timer.timekeeper);
                 this.moves = [];
                 this.start = true;
                 this.autoStart = false;
-                this.setTower();
                 var that = this;
                 this.timer.timekeeper = setInterval(function(){
                     that.second++;
@@ -295,8 +339,12 @@
                     this.second = 0;
                     this.steps = 0;
                     this.minSteps = Math.pow(2, this.startLevels) - 1;
+                    return true;
                 } else {
-                    alert("层数在2-10");
+                    this.title = "系统提示";
+                    this.content = "层数在2-10";
+                    this.showAlert();
+                    return false;
                 }
             },
             /** 
@@ -332,12 +380,15 @@
             },
             // 定时处理步骤集合
             handle() {
+                let is_start = this.setTower();
+                if (!is_start) {
+                    return;
+                }
                 clearInterval(this.timer.timekeeper);
                 clearInterval(this.timer.autoMove);
                 this.moves = [];
                 this.start = false;
                 this.autoStart = true;
-                this.setTower();
                 let moves = this.hanoi(this.startLevels, 0, 1, 2, []); //获取步数集
                 let that = this;
                 let i = 0;
@@ -382,6 +433,15 @@
                     step_moves.scrollTop = diff_height;
                 }
             },
+            //显示遮罩层弹窗
+            showAlert() {
+                this.$refs.dialog.showModal();
+            },
+            //关闭弹窗
+            closeAlert() {
+                this.$refs.dialog.close();
+            }
+        
         }
     })
     // console.log(vm.$refs.step_moves, vm.$el.querySelector('.step_moves'));
